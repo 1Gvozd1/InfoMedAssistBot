@@ -1,0 +1,114 @@
+import asyncio
+
+from aiogram import Dispatcher
+
+from Whisper import WhisperRecognizer
+from stt import AsyncSTT
+from create_bot import bot
+from keyboards import kb_client
+from aiogram.dispatcher.filters import Text
+from aiogram.dispatcher.filters.state import State, StatesGroup
+from aiogram import types
+import os
+from pathlib import Path
+import time
+import concurrent.futures
+
+
+# whisper = WhisperRecognizer()
+from transcriber import Transcriber
+
+transcriber = Transcriber(model_dir_path="models/vosk/modelSmall")
+
+content_type_mapping = {
+    types.ContentType.VOICE: 'voice',
+    types.ContentType.AUDIO: 'audio',
+    types.ContentType.DOCUMENT: 'document',
+}
+
+
+class FSMHospitalization(StatesGroup):
+    substation = State()
+    teamNumber = State()
+    cardNumber = State()
+    address = State()
+
+welcome_message = """\
+🏥 <b>Добро пожаловать в InfoMedAssistBot!</b> 🏥
+
+📚 Я - ваш надежный помощник в поиске информации и составлении документов для врачей скорой помощи. 📑
+
+💬 Пожалуйста, воспользуйтесь кнопками ниже, чтобы начать использование бота и получить необходимую помощь. 🤖
+
+🌟 Приятного использования и успешной работы! 🌟
+"""
+
+
+async def command_start(message: types.Message):
+    await message.answer(welcome_message, reply_markup=kb_client)
+
+# async def hospitalization_command(message: types.Message):
+#     await FSMHospitalization.substation.set()
+#     await message.answer('Введи ПССМП')
+#
+# @dp.message_handler(content_types=[''])
+# async def load_substation(message: types.Message, state: FSMContext):
+#     async with state.proxy() as data:
+#         data['substation'] = message.
+
+
+async def algorithms_command(message: types.Message):
+    #await message.delete()
+    await message.answer('Алгоритмы МОССМП')#, reply_markup=ReplyKeyboardRemove())
+
+async def speach_to_text(file_id):
+    file = await bot.get_file(file_id)
+    file_path = file.file_path
+    file_on_disk = Path("", f"{file_id}.tmp")
+    await bot.download_file(file_path, destination=file_on_disk)
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        text = await asyncio.to_thread(transcriber.pool_worker, file_on_disk)
+    os.remove(file_on_disk)
+    return text
+
+async def voice_message(message: types.Message):
+
+    if message.content_type in content_type_mapping:
+        file_id = getattr(message, content_type_mapping[message.content_type]).file_id
+    else:
+        await message.reply("Формат документа не поддерживается")
+        return
+    result = await speach_to_text(file_id)
+    await message.answer(f"Вы сказали: {result}")
+    # file = await bot.get_file(file_id)
+    # file_path = file.file_path
+    # file_on_disk = Path("", f"{file_id}.tmp")
+    # await bot.download_file(file_path, destination=file_on_disk)
+    # await message.reply("Аудио получено")
+    # with concurrent.futures.ThreadPoolExecutor() as executor:
+    #     text = await asyncio.to_thread(transcriber.pool_worker, file_on_disk)
+    # # text = await asyncio.get_event_loop().run_in_executor(None, transcriber.pool_worker, file_on_disk)
+    # # print(text)
+    # await message.answer(f"Вы сказали: {text}")
+    # # stt_instance = AsyncSTT()
+    # # text = await stt_instance.audio_to_text(file_on_disk)
+    # # await message.answer(f"Вы сказали: {text}")
+    # elapsed = time.time() - start_time
+    # print(elapsed)
+    # os.remove(file_on_disk)
+
+
+
+
+
+
+def register_handler_client(dp: Dispatcher):
+    dp.register_message_handler(command_start, commands=['start', 'help'])
+    # dp.register_message_handler(hospitalization_command, Text(equals="🏥 запрос на госпитализацию", ignore_case=True), state=None)
+    # dp.register_message_handler(test_command, content_types=['voice'])
+    dp.register_message_handler(voice_message, content_types=[
+    types.ContentType.VOICE,
+    types.ContentType.AUDIO,
+    types.ContentType.DOCUMENT
+    ])
+    dp.register_message_handler(algorithms_command, Text(equals="🧠 алгоритмы моссмп", ignore_case=True))
