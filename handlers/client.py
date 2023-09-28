@@ -78,8 +78,9 @@ async def voice_message(message: types.Message):
         await message.reply("Формат документа не поддерживается")
         return
 
+    await message.delete()
     # Отправляем начальное сообщение "Расшифровка" и сохраняем его объект
-    decryption_message = await message.answer("Расшифровка")
+    decryption_message = await message.answer(f"ПССМП: <b>Расшифровка</b>")
 
     # Создаем объект Event
     decryption_event = asyncio.Event()
@@ -88,18 +89,19 @@ async def voice_message(message: types.Message):
     asyncio.create_task(add_dots_periodically(decryption_message, decryption_event))
 
     result = await speach_to_text(file_id)
+    result = result.capitalize()
 
     # Устанавливаем Event, чтобы прервать цикл add_dots_periodically
     decryption_event.set()
 
     # Заменяем сообщение "Расшифровка" на результат расшифровки
-    await decryption_message.edit_text(f"Расшифровка: {result}")
+    await decryption_message.edit_text(f"<b>ПССМП:</b> {result}")
 
 async def add_dots_periodically(decryption_message, decryption_event):
     dots = 0
     while not decryption_event.is_set():
         dots = (dots + 1) % 4
-        await decryption_message.edit_text("Расшифровка" + "." * dots)
+        await decryption_message.edit_text(f"ПССМП: <b>Расшифровка</b>" + "<b>.</b>" * dots)
         await asyncio.sleep(1)
     # file = await bot.get_file(file_id)
     # file_path = file.file_path
