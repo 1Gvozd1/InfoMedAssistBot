@@ -72,14 +72,35 @@ async def speach_to_text(file_id):
     return text
 
 async def voice_message(message: types.Message):
-
     if message.content_type in content_type_mapping:
         file_id = getattr(message, content_type_mapping[message.content_type]).file_id
     else:
         await message.reply("Формат документа не поддерживается")
         return
+
+    # Отправляем начальное сообщение "Расшифровка" и сохраняем его объект
+    decryption_message = await message.answer("Расшифровка")
+
+    # Создаем объект Event
+    decryption_event = asyncio.Event()
+
+    # Запускаем асинхронную функцию для добавления точек
+    asyncio.create_task(add_dots_periodically(decryption_message, decryption_event))
+
     result = await speach_to_text(file_id)
-    await message.answer(f"Вы сказали: {result}")
+
+    # Устанавливаем Event, чтобы прервать цикл add_dots_periodically
+    decryption_event.set()
+
+    # Заменяем сообщение "Расшифровка" на результат расшифровки
+    await decryption_message.edit_text(f"Расшифровка: {result}")
+
+async def add_dots_periodically(decryption_message, decryption_event):
+    dots = 0
+    while not decryption_event.is_set():
+        dots = (dots + 1) % 4
+        await decryption_message.edit_text("Расшифровка" + "." * dots)
+        await asyncio.sleep(1)
     # file = await bot.get_file(file_id)
     # file_path = file.file_path
     # file_on_disk = Path("", f"{file_id}.tmp")
