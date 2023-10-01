@@ -15,6 +15,8 @@ import time
 import concurrent.futures
 
 
+dp= Dispatcher(bot)
+
 # whisper = WhisperRecognizer()
 from transcriber import Transcriber
 
@@ -61,6 +63,14 @@ async def algorithms_command(message: types.Message):
     #await message.delete()
     await message.answer('Алгоритмы МОССМП')#, reply_markup=ReplyKeyboardRemove())
 
+
+async def echo_message(message: types.Message):
+    await message.delete()
+    text = message.text
+    parts = text.split(":")
+    result = parts[1].strip()  # Удаляем лишние пробелы в начале и конце фразы
+    await message.answer(result)
+
 async def speach_to_text(file_id):
     file = await bot.get_file(file_id)
     file_path = file.file_path
@@ -72,13 +82,13 @@ async def speach_to_text(file_id):
     return text
 
 async def voice_message(message: types.Message):
+    await message.delete()
     if message.content_type in content_type_mapping:
         file_id = getattr(message, content_type_mapping[message.content_type]).file_id
     else:
         await message.reply("Формат документа не поддерживается")
         return
 
-    await message.delete()
     # Отправляем начальное сообщение "Расшифровка" и сохраняем его объект
     decryption_message = await message.answer(f"ПССМП: <b>Расшифровка</b>")
 
@@ -94,8 +104,18 @@ async def voice_message(message: types.Message):
     # Устанавливаем Event, чтобы прервать цикл add_dots_periodically
     decryption_event.set()
 
-    # Заменяем сообщение "Расшифровка" на результат расшифровки
-    await decryption_message.edit_text(f"<b>ПССМП:</b> {result}")
+    # Заменяем сообщение "Расшифровка" на результат расшифровки и добавляем кнопку "Редактировать"
+    await decryption_message.edit_text(
+        f"<b>ПССМП:</b> {result}",
+        reply_markup=types.InlineKeyboardMarkup(inline_keyboard=[
+            [
+                types.InlineKeyboardButton(
+                    text="Редактировать",
+                    switch_inline_query_current_chat=f"ПССМП редактирование:\n{result}",
+                )
+            ]
+        ])
+    )
 
 async def add_dots_periodically(decryption_message, decryption_event):
     dots = 0
@@ -129,6 +149,7 @@ def register_handler_client(dp: Dispatcher):
     dp.register_message_handler(command_start, commands=['start', 'help'])
     # dp.register_message_handler(hospitalization_command, Text(equals="🏥 запрос на госпитализацию", ignore_case=True), state=None)
     # dp.register_message_handler(test_command, content_types=['voice'])
+    dp.register_message_handler(echo_message, )
     dp.register_message_handler(voice_message, content_types=[
     types.ContentType.VOICE,
     types.ContentType.AUDIO,
