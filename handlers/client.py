@@ -111,7 +111,7 @@ async def voice_message(message: types.Message):
             [
                 types.InlineKeyboardButton(
                     text="Редактировать",
-                    switch_inline_query_current_chat=f"ПССМП редактирование:\n{result}",
+                    switch_inline_query_current_chat=f"\n\n✏ Редактирование:\n\n{result}",
                 )
             ]
         ])
