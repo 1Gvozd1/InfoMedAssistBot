@@ -110,7 +110,7 @@ async def voice_message(message: types.Message):
         reply_markup=types.InlineKeyboardMarkup(inline_keyboard=[
             [
                 types.InlineKeyboardButton(
-                    text="Редактировать",
+                    text="✏ Редактировать",
                     switch_inline_query_current_chat=f"\n\n✏ Редактирование:\n\n{result}",
                 )
             ]
