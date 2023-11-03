@@ -1,11 +1,17 @@
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
+from aiogram.types import InlineKeyboardMarkup,InlineKeyboardButton, ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
 
-b1 = KeyboardButton('🏥 Запрос на госпитализацию')
-b2 = KeyboardButton('🧠 Алгоритмы МОССМП')
+ikb_client_start = InlineKeyboardMarkup(row_width=1)#, one_time_keyboard=True)
+
+b1 = InlineKeyboardButton(text='🏥 Запрос на госпитализацию', callback_data="main_page")
+
+ikb_client_start.add(b1)
+
+ikb_client_main = InlineKeyboardMarkup(row_width=1)#, one_time_keyboard=True)
+
+b2 = InlineKeyboardButton(text='Назад', callback_data="start_page")
+
+ikb_client_main.add(b2)
+#b2 = InlineKeyboardButton(text='🧠 Алгоритмы МОССМП')
 #b3 = KeyboardButton('Поделиться номером', request_contact=True)
 #b4 = KeyboardButton('Отправить где я', request_location=True)
 
-kb_client = ReplyKeyboardMarkup()#, one_time_keyboard=True)
-
-
-kb_client.add(b1).add(b2)

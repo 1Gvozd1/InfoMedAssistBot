@@ -1,1 +1,2 @@
-from keyboards.client_kb import kb_client
+from keyboards.client_kb import ikb_client_start
+from keyboards.client_kb import ikb_client_main

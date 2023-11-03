@@ -5,7 +5,8 @@ from aiogram import Dispatcher
 from Whisper import WhisperRecognizer
 from stt import AsyncSTT
 from create_bot import bot
-from keyboards import kb_client
+from keyboards import ikb_client_main, ikb_client_start
+from aiogram.types import InlineKeyboardMarkup,InlineKeyboardButton, ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove, InputMedia
 from aiogram.dispatcher.filters import Text
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram import types
@@ -28,7 +29,6 @@ content_type_mapping = {
     types.ContentType.DOCUMENT: 'document',
 }
 
-
 class FSMHospitalization(StatesGroup):
     substation = State()
     teamNumber = State()
@@ -45,9 +45,9 @@ welcome_message = """\
 🌟 Приятного использования и успешной работы! 🌟
 """
 
-
 async def command_start(message: types.Message):
-    await message.answer(welcome_message, reply_markup=kb_client)
+    await bot.send_photo(chat_id=message.chat.id, photo="https://wampi.ru/image/Yd23mnl", caption=welcome_message, reply_markup=ikb_client_start)
+
 
 # async def hospitalization_command(message: types.Message):
 #     await FSMHospitalization.substation.set()
@@ -58,11 +58,20 @@ async def command_start(message: types.Message):
 #     async with state.proxy() as data:
 #         data['substation'] = message.
 
+async def main_page(callback: types.CallbackQuery):
+     file = InputMedia(media="https://wampi.ru/image/Yd23mnl", caption="Updated caption :)")
+     await callback.message.edit_media(file, reply_markup=ikb_client_main)
+     await callback.answer()
+
+async def start_page(callback: types.CallbackQuery):
+     file = InputMedia(media="https://wampi.ru/image/Yd23mnl", caption=welcome_message)
+     await callback.message.edit_media(file, reply_markup=ikb_client_start)
+     await callback.answer()
+
 
 async def algorithms_command(message: types.Message):
     #await message.delete()
     await message.answer('Алгоритмы МОССМП')#, reply_markup=ReplyKeyboardRemove())
-
 
 async def echo_message(message: types.Message):
     await message.delete()
@@ -156,3 +165,5 @@ def register_handler_client(dp: Dispatcher):
     types.ContentType.DOCUMENT
     ])
     dp.register_message_handler(algorithms_command, Text(equals="🧠 алгоритмы моссмп", ignore_case=True))
+    dp.register_callback_query_handler(main_page, Text(equals="main_page", ignore_case=True))
+    dp.register_callback_query_handler(start_page, Text(equals="start_page", ignore_case=True))
