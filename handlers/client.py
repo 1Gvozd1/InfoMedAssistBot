@@ -23,6 +23,9 @@ from transcriber import Transcriber
 
 transcriber = Transcriber(model_dir_path="models/vosk/modelSmall")
 
+global dicti
+dicti = {"id":0}
+
 content_type_mapping = {
     types.ContentType.VOICE: 'voice',
     types.ContentType.AUDIO: 'audio',
@@ -59,13 +62,14 @@ async def command_start(message: types.Message):
 #         data['substation'] = message.
 
 async def main_page(callback: types.CallbackQuery):
-     await callback.message.delete()
-     await bot.send_photo(chat_id=callback.message.chat.id, photo="https://wampi.ru/image/Yd23mnl", caption="привет", reply_markup=ikb_client_main)
+     file = InputMedia(media="https://wampi.ru/image/Yd23mnl", caption="Updated caption :)")
+     await callback.message.edit_media(file, reply_markup=ikb_client_main)
+     dicti["id"] = callback.message.message_id
      await callback.answer()
 
 async def start_page(callback: types.CallbackQuery):
-     await callback.message.delete()
-     await bot.send_photo(chat_id=callback.message.chat.id, photo="https://wampi.ru/image/Yd23mnl", caption=welcome_message, reply_markup=ikb_client_start)
+     file = InputMedia(media="https://wampi.ru/image/Yd23mnl", caption=welcome_message)
+     await callback.message.edit_media(file, reply_markup=ikb_client_start)
      await callback.answer()
 
 
@@ -74,11 +78,26 @@ async def algorithms_command(message: types.Message):
     await message.answer('Алгоритмы МОССМП')#, reply_markup=ReplyKeyboardRemove())
 
 async def echo_message(message: types.Message):
-    await message.delete()
+    await bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
     text = message.text
-    parts = text.split(":")
-    result = parts[1].strip()  # Удаляем лишние пробелы в начале и конце фразы
-    await message.answer(result)
+    file = InputMedia(media="https://wampi.ru/image/Yd23mnl", caption=text)
+    try:
+        await bot.edit_message_media(media=file,chat_id=message.chat.id,message_id=dicti["id"], reply_markup=ikb_client_main)
+    except:
+        pass
+
+
+        
+
+
+    # await bot.delete_message(chat_id=message.chat.id, message_id=message.message_id-1)
+    # await bot.send_photo(chat_id=message.chat.id, photo="https://wampi.ru/image/Yd23mnl", caption=text, reply_markup=ikb_client_start)
+
+    # await message.delete()
+    # text = message.text
+    # parts = text.split(":")
+    # result = parts[1].strip()  # Удаляем лишние пробелы в начале и конце фразы
+    # await message.answer(result)
 
 async def speach_to_text(file_id):
     file = await bot.get_file(file_id)
