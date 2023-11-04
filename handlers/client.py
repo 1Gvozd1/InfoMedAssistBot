@@ -23,6 +23,9 @@ from transcriber import Transcriber
 
 transcriber = Transcriber(model_dir_path="models/vosk/modelSmall")
 
+global mydict 
+mydict = {'Первый заголовок:':'Пустота 1', 'Второй заголовок:':'Пустота 2'}
+
 content_type_mapping = {
     types.ContentType.VOICE: 'voice',
     types.ContentType.AUDIO: 'audio',
@@ -59,13 +62,13 @@ async def command_start(message: types.Message):
 #         data['substation'] = message.
 
 async def main_page(callback: types.CallbackQuery):
-     file = InputMedia(media="https://wampi.ru/image/Yd23mnl", caption="Updated caption :)")
-     await callback.message.edit_media(file, reply_markup=ikb_client_main)
+     await callback.message.delete()
+     await bot.send_photo(chat_id=callback.message.chat.id, photo="https://wampi.ru/image/Yd23mnl", caption="привет", reply_markup=ikb_client_main)
      await callback.answer()
 
 async def start_page(callback: types.CallbackQuery):
-     file = InputMedia(media="https://wampi.ru/image/Yd23mnl", caption=welcome_message)
-     await callback.message.edit_media(file, reply_markup=ikb_client_start)
+     await callback.message.delete()
+     await bot.send_photo(chat_id=callback.message.chat.id, photo="https://wampi.ru/image/Yd23mnl", caption=welcome_message, reply_markup=ikb_client_start)
      await callback.answer()
 
 
