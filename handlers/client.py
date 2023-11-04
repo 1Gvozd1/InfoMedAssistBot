@@ -23,9 +23,6 @@ from transcriber import Transcriber
 
 transcriber = Transcriber(model_dir_path="models/vosk/modelSmall")
 
-global mydict 
-mydict = {'Первый заголовок:':'Пустота 1', 'Второй заголовок:':'Пустота 2'}
-
 content_type_mapping = {
     types.ContentType.VOICE: 'voice',
     types.ContentType.AUDIO: 'audio',
