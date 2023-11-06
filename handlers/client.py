@@ -23,7 +23,11 @@ from transcriber import Transcriber
 
 transcriber = Transcriber(model_dir_path="models/vosk/modelSmall")
 
-global dicti
+template = """\
+ПССМП
+АДРЕС
+"""
+
 dicti = {"id":0}
 
 content_type_mapping = {
@@ -62,9 +66,9 @@ async def command_start(message: types.Message):
 #         data['substation'] = message.
 
 async def main_page(callback: types.CallbackQuery):
-     file = InputMedia(media="https://wampi.ru/image/Yd23mnl", caption="Updated caption :)")
+     file = InputMedia(media="https://wampi.ru/image/Yd23mnl", caption=template)
      await callback.message.edit_media(file, reply_markup=ikb_client_main)
-     dicti["id"] = callback.message.message_id
+     dicti[callback.message.chat.id] = callback.message.message_id
      await callback.answer()
 
 async def start_page(callback: types.CallbackQuery):
@@ -80,9 +84,10 @@ async def algorithms_command(message: types.Message):
 async def echo_message(message: types.Message):
     await bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
     text = message.text
-    file = InputMedia(media="https://wampi.ru/image/Yd23mnl", caption=text)
+    result = template.replace("АДРЕС", "АДРЕС: " + text)
+    file = InputMedia(media="https://wampi.ru/image/Yd23mnl", caption=result)
     try:
-        await bot.edit_message_media(media=file,chat_id=message.chat.id,message_id=dicti["id"], reply_markup=ikb_client_main)
+        await bot.edit_message_media(media=file,chat_id=message.chat.id,message_id=dicti[message.chat.id], reply_markup=ikb_client_main)
     except:
         pass
 
