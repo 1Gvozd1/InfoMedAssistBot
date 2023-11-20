@@ -14,6 +14,7 @@ from aiogram import types
 import os
 from pathlib import Path
 import concurrent.futures
+from data_base import sqlite_db
 
 
 dp= Dispatcher(bot)
@@ -54,17 +55,17 @@ class FSMHospitalization(StatesGroup):
     substation = State()
     teamNumber = State()
     cardNumber = State()
-    address = State()
-    genderAndAge = State()
-    diagnosis = State()
-    overallConditionSeverity = State()
-    levelOfConsciousness = State()
-    heartRate = State()
-    bloodPressur = State()
-    respiratoryRate  = State()
-    oxygenSaturation  = State()
-    bodyTemperature = State()
-    address = State()
+    # address = State()
+    # genderAndAge = State()
+    # diagnosis = State()
+    # overallConditionSeverity = State()
+    # levelOfConsciousness = State()
+    # heartRate = State()
+    # bloodPressur = State()
+    # respiratoryRate  = State()
+    # oxygenSaturation  = State()
+    # bodyTemperature = State()
+    # address = State()
     crewPhone = State()
 
 welcome_message = """\
