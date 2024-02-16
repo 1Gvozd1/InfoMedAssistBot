@@ -14,7 +14,6 @@ from aiogram import types
 import os
 from pathlib import Path
 import concurrent.futures
-from data_base import sqlite_db
 
 
 dp= Dispatcher(bot)
