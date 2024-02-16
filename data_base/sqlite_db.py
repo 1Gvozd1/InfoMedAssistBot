@@ -14,4 +14,4 @@ async def sql_add_command(state):
     async with state.proxy() as data:
         # cur.execute('INSERT INTO user VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', tuple(data.values()))
         cur.execute('INSERT INTO user VALUES (?, ?, ?, ?, ?)', tuple(data.values()))
-        base.commit
+        base.commit()
