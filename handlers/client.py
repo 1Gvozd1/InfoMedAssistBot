@@ -19,6 +19,7 @@ import time
 
 dp= Dispatcher(bot)
 
+
 # whisper = WhisperRecognizer()
 from transcriber import Transcriber
 
