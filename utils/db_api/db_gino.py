@@ -3,19 +3,12 @@ from typing import List
 import sqlalchemy as sa
 from sqlalchemy import Column, BigInteger,String
 import datetime
-import os
+from data import config
 
 
 from aiogram import Dispatcher
 
 db = Gino()
-
-ip = 'localhost'
-PGUSER = 'postgres'
-PGPASSWORD = 'd6435h7j7d34'
-DATABASE = 'gino'
-
-POSTGRES_URI = f'postgresql://{PGUSER}:{PGPASSWORD}@{ip}/{DATABASE}'
 
 class BaseModel(db.Model):
     __abstract__ = True
@@ -42,6 +35,6 @@ class TimedBaseModel(BaseModel):
         server_default=db.func.now(),
     )
 
-async def on_startup(dispatcher: Dispatcher):
+async def on_start(dispatcher: Dispatcher):
     print('Установка связи с PostgreSQL')
-    await db.set_bind(POSTGRES_URI)
+    await db.set_bind(config.POSTGRES_URI)

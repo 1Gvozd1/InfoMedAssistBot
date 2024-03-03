@@ -1,1 +1,1 @@
-from schemas.user import User
+from utils.db_api.schemas.user import User

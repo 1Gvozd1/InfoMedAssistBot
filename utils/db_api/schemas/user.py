@@ -1,6 +1,6 @@
 from sqlalchemy import Column,BigInteger,String,sql
 
-from db_gino import TimedBaseModel
+from utils.db_api.db_gino import TimedBaseModel
 
 class User(TimedBaseModel):
     __tablename__ = 'users'
