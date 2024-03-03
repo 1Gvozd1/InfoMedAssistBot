@@ -70,7 +70,7 @@ class FSMHospitalization(StatesGroup):
     crewPhone = State()
 
 welcome_message = """\
-🏥 <b>Добро пожаловать в InfoMedAssistBot!</b> 🏥
+🏥 <b>{first_name}, добро пожаловать в InfoMedAssistBot!</b> 🏥
 
 📚 Я - ваш надежный помощник в поиске информации и составлении документов для врачей скорой помощи. 📑
 
@@ -81,14 +81,15 @@ welcome_message = """\
 
 async def command_start(message: types.Message):
     try:
-        await bot.send_photo(chat_id=message.chat.id, photo="https://wampi.ru/image/Yd23mnl", caption=welcome_message, reply_markup=ikb_client_start)
         user = await commands.get_user(message.from_user.id)
+        await bot.send_photo(chat_id=message.chat.id, photo="https://wampi.ru/image/Yd23mnl", caption=welcome_message.format(first_name=user.first_name), reply_markup=ikb_client_start)
     except Exception:
         await commands.add_user(user_id=message.from_user.id, 
                                 first_name=message.from_user.first_name,
                                 last_name=message.from_user.last_name,
                                 username=message.from_user.username,
                                 status='active')
+        await bot.send_photo(chat_id=message.chat.id, photo="https://wampi.ru/image/Yd23mnl", caption=welcome_message.format(first_name=message.from_user.first_name), reply_markup=ikb_client_start)
 
 
 
