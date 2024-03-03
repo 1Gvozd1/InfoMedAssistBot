@@ -15,7 +15,7 @@ import os
 from pathlib import Path
 import concurrent.futures
 import time
-
+from utils.db_api import quick_commands as commands
 
 dp= Dispatcher(bot)
 
@@ -80,7 +80,16 @@ welcome_message = """\
 """
 
 async def command_start(message: types.Message):
-    await bot.send_photo(chat_id=message.chat.id, photo="https://wampi.ru/image/Yd23mnl", caption=welcome_message, reply_markup=ikb_client_start)
+    try:
+        await bot.send_photo(chat_id=message.chat.id, photo="https://wampi.ru/image/Yd23mnl", caption=welcome_message, reply_markup=ikb_client_start)
+        user = await commands.get_user(message.from_user.id)
+    except Exception:
+        await commands.add_user(user_id=message.from_user.id, 
+                                first_name=message.from_user.first_name,
+                                last_name=message.from_user.last_name,
+                                username=message.from_user.username,
+                                status='active')
+
 
 
 # async def hospitalization_command(message: types.Message):
