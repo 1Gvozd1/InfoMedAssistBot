@@ -19,8 +19,11 @@ async def count_users():
     return count
 
 async def get_user(user_id):
-    user = await User.query.where(User.user_id == user_id).gino.first()
-    return user
+    try:
+        user = await User.query.where(User.user_id == user_id).gino.first()
+        return user
+    except Exception:
+        return None
 
 async def update_user_name(user_id, new_name):
     user = await get_user(user_id)
