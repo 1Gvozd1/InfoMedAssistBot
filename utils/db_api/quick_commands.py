@@ -10,7 +10,7 @@ async def add_user(user_id: int, first_name: str, last_name: str, username: str,
     except UniqueViolationError:
         print("Пользователь не добавлен")
 
-async def select_all_users():
+async def get_all_users():
     users = await User.query.gino.all()
     return users
 
@@ -28,3 +28,28 @@ async def get_user(user_id):
 async def update_user_name(user_id, new_name):
     user = await get_user(user_id)
     await user.update(update_name = new_name).apply()
+
+async def get_form(user_id, point):
+    try:
+        user = await get_user(user_id)
+        form = f"""\
+{'<b>' if point == "ПССМП" else ''}ПССМП: {user.first_name}{'</b>' if point == "ПССМП" else ''}
+Номер бригады:
+Номер карты вызова:
+Адрес места вызова:
+Пол и возраст больного:
+Диагноз основной:
+Общая тяжесть состояния:
+Уровень сознания по ШКГ:
+ЧСС:
+АД:
+ЧДД:
+SpO2:
+Температура тела:
+Прописка:
+Телефон бригады:
+Запрос на госпитализацию
+"""
+        return form
+    except Exception:
+        return None

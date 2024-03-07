@@ -107,7 +107,7 @@ async def command_start(message: types.Message):
 
 
 async def start_page(callback: types.CallbackQuery):
-     file = InputMedia(media="https://wampi.ru/image/Yd23mnl", caption=welcome_message)
+     file = InputMedia(media="https://wampi.ru/image/Yd23mnl", caption=welcome_message.format(first_name=callback.from_user.first_name))
      try:
         await callback.message.edit_media(file, reply_markup=ikb_client_start)
         await callback.answer()
@@ -116,8 +116,8 @@ async def start_page(callback: types.CallbackQuery):
 
 async def main_page(callback: types.CallbackQuery):
     #  await FSMHospitalization.substation.set() НАЧАЛО FSM Машины
-     result = template.replace("ПССМП:", "<b>ПССМП:</b>")
-     file = InputMedia(media="https://postimg.cc/WF6GZYbV", caption=result)
+     form = await commands.get_form(callback.from_user.id, "ПССМП") 
+     file = InputMedia(media="https://postimg.cc/WF6GZYbV", caption=form)
      try:
         await callback.message.edit_media(file, reply_markup=ikb_client_main)
         #  dicti[callback.message.chat.id] = callback.message.message_id ПОКА ХЗ ДЛЯ ЧЕГО
