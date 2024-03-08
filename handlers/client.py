@@ -1,4 +1,5 @@
 import asyncio
+from enum import Enum
 
 from aiogram import Dispatcher
 
@@ -24,6 +25,10 @@ dp= Dispatcher(bot)
 from transcriber import Transcriber
 
 transcriber = Transcriber(model_dir_path="models/vosk/modelSmall")
+
+class Point(Enum):
+    PSSMP = "ПССМП"
+    BRIGADE_NUMBER = "Номер бригады"
 
 template = """\
 ПССМП:
@@ -87,7 +92,23 @@ async def command_start(message: types.Message):
                                 first_name=message.from_user.first_name,
                                 last_name=message.from_user.last_name,
                                 username=message.from_user.username,
-                                status='active')
+                                status='active',
+                                pssmp='',
+                                brigade_number='',
+                                call_card_number='',
+                                call_address='',
+                                patient_gender_age='',
+                                main_diagnosis='',
+                                condition_severity='',
+                                consciousness_level='',
+                                hr='',
+                                bp='',
+                                rr='',
+                                spo='',
+                                body_temperature='',
+                                registration='',
+                                brigade_phone=''
+                                )
             await bot.send_photo(chat_id=message.chat.id, photo="https://wampi.ru/image/Yd23mnl", caption=welcome_message.format(first_name=message.from_user.first_name), reply_markup=ikb_client_start)
         else:
             await bot.send_photo(chat_id=message.chat.id, photo="https://wampi.ru/image/Yd23mnl", caption=welcome_message.format(first_name=user.first_name), reply_markup=ikb_client_start)
@@ -116,7 +137,9 @@ async def start_page(callback: types.CallbackQuery):
 
 async def main_page(callback: types.CallbackQuery):
     #  await FSMHospitalization.substation.set() НАЧАЛО FSM Машины
+     start_time = time.time()
      form = await commands.get_form(callback.from_user.id, "ПССМП") 
+     print("--- %s seconds ---" % (time.time() - start_time))
      file = InputMedia(media="https://postimg.cc/WF6GZYbV", caption=form)
      try:
         await callback.message.edit_media(file, reply_markup=ikb_client_main)
