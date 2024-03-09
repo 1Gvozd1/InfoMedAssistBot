@@ -3,6 +3,24 @@ from utils.db_api.db_gino import db
 
 from asyncpg import UniqueViolationError
 
+form_dict = {
+            "ПССМП": "pssmp",
+            "Номер бригады": "brigade_number",
+            "Номер карты вызова": "call_card_number",
+            "Адрес места вызова": "call_address",
+            "Пол и возраст больного": "patient_gender_age",
+            "Диагноз основной": "main_diagnosis",
+            "Общая тяжесть состояния": "condition_severity",
+            "Уровень сознания по ШКГ": "consciousness_level",
+            "ЧСС": "hr",
+            "АД": "bp",
+            "ЧДД": "rr",
+            "SpO2": "spo",
+            "Температура тела": "body_temperature",
+            "Прописка": "registration",
+            "Телефон бригады": "brigade_phone"
+        }
+
 async def add_user(user_id: int, 
                    first_name: str, 
                    last_name: str, 
@@ -69,28 +87,19 @@ async def update_user_name(user_id, new_name):
     user = await get_user(user_id)
     await user.update(update_name = new_name).apply()
 
+
 async def get_form(user_id, point):
     try:
         user = await get_user(user_id)
-        form_lines = [
-            f"ПССМП: {user.pssmp}",
-            f"Номер бригады: {user.brigade_number}",
-            f"Номер карты вызова: {user.call_card_number}",
-            f"Адрес места вызова: {user.call_address}",
-            f"Пол и возраст больного: {user.patient_gender_age}",
-            f"Диагноз основной: {user.main_diagnosis}",
-            f"Общая тяжесть состояния: {user.condition_severity}",
-            f"Уровень сознания по ШКГ: {user.consciousness_level}",
-            f"ЧСС: {user.hr}",
-            f"АД: {user.bp}",
-            f"ЧДД: {user.rr}",
-            f"SpO2: {user.spo}",
-            f"Температура тела: {user.body_temperature}",
-            f"Прописка: {user.registration}",
-            f"Телефон бригады: {user.brigade_phone}"
-        ]
-        # Формирование многострочной строки с выделением тегами <>
-        form = "\n".join((f"<b>> {line} </b>") if point in line else (f"{line}") for line in form_lines)
+        global form_dict
+        form=''
+        for key, value in form_dict.items():
+            if point in key:
+                form+=f"<b>> {key}: {getattr(user, value)}</b>" + '\n'
+            else:
+                form+=f"{key}: {getattr(user, value)}" + '\n'
+            if getattr(user, value):
+                form+=f"✅ {key}: {getattr(user, value)}" + '\n'
         return form
     except Exception:
         return None
